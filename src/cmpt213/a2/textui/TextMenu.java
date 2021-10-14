@@ -1,4 +1,4 @@
-package cmpt213.assignment2.foodexpdatestracker;
+package cmpt213.a2.textui;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -1,0 +1,88 @@
+with https://echeung.me/crcmaker/
+[
+  {
+    "name": "FoodItem",
+    "superclasses": "",
+    "subclasses": "",
+    "type": 1,
+    "responsibilities": [
+      "Store information about food items."
+    ],
+    "collaborators": [
+      "MainMenu",
+      "ConsumablesTracker"
+    ]
+  },
+  {
+    "name": "DrinkItem",
+    "superclasses": "",
+    "subclasses": "",
+    "type": 1,
+    "responsibilities": [
+      "Stores information about drink items."
+    ],
+    "collaborators": [
+      "MainMenu",
+      "ConsumablesTracker"
+    ]
+  },
+  {
+    "name": "TextMenu",
+    "superclasses": "",
+    "subclasses": "",
+    "type": 1,
+    "responsibilities": [
+      "Displays menu options and returns user choice."
+    ],
+    "collaborators": [
+      "MainMenu"
+    ]
+  },
+  {
+    "name": "MainMenu",
+    "superclasses": "",
+    "subclasses": "",
+    "type": 1,
+    "responsibilities": [
+      "Handles menu operations.",
+      "Displays consumable list.",
+      "Modifies consumable list."
+    ],
+    "collaborators": [
+      "FoodItem",
+      "DrinkItem",
+      "TextMenu",
+      "ConsumablesTracker"
+    ]
+  },
+  {
+    "name": "ConsumablesTracker",
+    "superclasses": "",
+    "subclasses": "",
+    "type": 1,
+    "responsibilities": [
+      "Loads consumable list upon launch.",
+      "Saves consumable list upon termination.",
+      "Entry point for MainMenu."
+    ],
+    "collaborators": [
+      "FoodItem",
+      "DrinkItem",
+      "MainMenu"
+    ]
+  },
+  {
+    "name": "ConsumableFactory",
+    "superclasses": "",
+    "subclasses": "",
+    "type": 1,
+    "responsibilities": [
+      "Constructs and returns a FoodItem or DrinkItem."
+    ],
+    "collaborators": [
+      "FoodItem",
+      "DrinkItem",
+      "MainMenu"
+    ]
+  }
+]

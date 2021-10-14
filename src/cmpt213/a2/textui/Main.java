@@ -1,5 +1,7 @@
-package cmpt213.assignment2.foodexpdatestracker;
+package cmpt213.a2.textui;
 
+import cmpt213.a2.model.FoodItem;
+import cmpt213.a2.textui.TextMenu;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -134,6 +136,7 @@ public class Main {
             day = getInt();
         }
 
+        //TODO: put all of this in a try-catch so the program can catch invalid dates
         LocalDateTime expiry = LocalDateTime.of(year, month, day, 23, 59);
         FoodItem newFoodItem = new FoodItem(foodName, foodNotes, price, expiry);
 
