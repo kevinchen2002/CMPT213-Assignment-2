@@ -2,7 +2,7 @@ with https://echeung.me/crcmaker/
 [
   {
     "name": "FoodItem",
-    "superclasses": "",
+    "superclasses": "Consumable",
     "subclasses": "",
     "type": 1,
     "responsibilities": [
@@ -15,7 +15,7 @@ with https://echeung.me/crcmaker/
   },
   {
     "name": "DrinkItem",
-    "superclasses": "",
+    "superclasses": "Consumable",
     "subclasses": "",
     "type": 1,
     "responsibilities": [
@@ -83,6 +83,19 @@ with https://echeung.me/crcmaker/
       "FoodItem",
       "DrinkItem",
       "MainMenu"
+    ]
+  },
+  {
+    "name": "Consumable",
+    "superclasses": "",
+    "subclasses": "FoodItem, DrinkItem",
+    "type": 1,
+    "responsibilities": [
+      "Defines behaviour for consumable items."
+    ],
+    "collaborators": [
+      "FoodItem",
+      "DrinkItem"
     ]
   }
 ]
