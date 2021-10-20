@@ -1,1 +1,1 @@
-[{"name":"7","notes":"7","price":7.0,"expDate":"2007-07-07T23:59","daysUntilExp":-5212,"isExpired":true}]
+[{"volume":500.0,"name":"Milk","notes":"","price":3.45,"expDate":"2021-09-30T23:59","daysUntilExp":-19,"isExpired":true},{"weight":80.0,"name":"Salmon sushi roll","notes":"Need more wasabi","price":6.5,"expDate":"2021-10-08T23:59","daysUntilExp":-11,"isExpired":true},{"weight":20.0,"name":"Mooncake","notes":"Serve with tea","price":14.99,"expDate":"2021-10-16T23:59","daysUntilExp":-3,"isExpired":true}]

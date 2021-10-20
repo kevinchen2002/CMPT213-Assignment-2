@@ -1,7 +1,8 @@
 package cmpt213.a2.textui;
 
+import cmpt213.a2.model.Consumable;
+import cmpt213.a2.model.ConsumableFactory;
 import cmpt213.a2.model.FoodItem;
-import cmpt213.a2.textui.TextMenu;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -11,6 +12,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +21,12 @@ import java.util.Scanner;
 /**
  * Main class
  */
-public class Main {
+public class MainMenu {
 
     /**
      * ArrayList of FoodItems
      */
-    static ArrayList<FoodItem> foodList = new ArrayList<>();
+    static ArrayList<Consumable> consumableList = new ArrayList<>();
 
     static String fileName = "data.json";
 
@@ -62,16 +64,46 @@ public class Main {
         }
     }
 
+    static LocalDateTime getLocalDateTime() {
+        while (true) {
+            int year = -1;
+            int month = -1;
+            int day = -1;
+            LocalDateTime expiry;
+            try {
+                final int MIN_YEAR = 2000;
+                while (year < MIN_YEAR) {
+                    System.out.println("Enter the year of the expiry date: ");
+                    year = getInt();
+                }
+                final int MAX_MONTH = 12;
+                while (month < 1 || month > MAX_MONTH) {
+                    System.out.println("Enter the month of the expiry date: ");
+                    month = getInt();
+                }
+                final int MAX_DAY = 31;
+                while (day < 1 || day > MAX_DAY) {
+                    System.out.println("Enter the day of the expiry date: ");
+                    day = getInt();
+                }
+                expiry = LocalDateTime.of(year, month, day, 23, 59);
+                return expiry;
+            } catch(DateTimeException e) {
+                System.out.println("Invalid date!\n");
+            }
+        }
+    }
+
     /**
      * menu option 1; lists all food items
      */
     static void listFood() {
-        if (foodList.isEmpty()) {
-            System.out.println("There are no food items!");
+        if (consumableList.isEmpty()) {
+            System.out.println("There are no consumable items!");
         }
         int itemNum = 1;
-        for (FoodItem item : foodList) {
-            System.out.println("\nFood Item #" + itemNum);
+        for (Consumable item : consumableList) {
+            System.out.println("\nConsumable Item #" + itemNum);
             System.out.println(item);
             itemNum++;
         }
@@ -85,75 +117,67 @@ public class Main {
     static void addFood() {
         Scanner in = new Scanner(System.in);
 
-        FoodItem dummy = new FoodItem("dummy", "dummy", 1, LocalDateTime.now());
-        foodList.add(dummy);
+        FoodItem dummy = new FoodItem("dummy", "dummy", 1, 1, LocalDateTime.now());
+        consumableList.add(dummy);
 
-        String foodName = "";
-        while (foodName.equals("")) {
-            System.out.println("Enter the name of the new food item: ");
-            foodName = in.nextLine();
+        int itemType = 0;
+        while (itemType < 1 || itemType > 2) {
+            System.out.println("Is this a [1] Food item or [2] Drink item?");
+            itemType = getInt();
         }
 
-        String foodNotes;
-        System.out.println("Enter any notes for the new food item: ");
-        foodNotes = in.nextLine();
+        boolean isFood;
+        isFood = itemType == 1;
+
+        String itemName = "";
+        while (itemName.equals("")) {
+            System.out.println("Enter the name of the new consumable item: ");
+            itemName = in.nextLine();
+        }
+
+        String itemNotes;
+        System.out.println("Enter any notes for the new consumable item: ");
+        itemNotes = in.nextLine();
 
         //get price
         double price = -1.0;
         while (price < 0) {
-            System.out.println("Enter the price of this item: ");
+            System.out.println("Enter the price of this consumable item: ");
             price = getDouble();
         }
 
-        //get expiry year
-        int year = -1;
-        final int MIN_YEAR = 2000;
-        while (year < MIN_YEAR) {
-            System.out.println("Enter the year of the expiry date: ");
-            year = getInt();
+        //get weight
+        double weightOrVolume = -1;
+        while (weightOrVolume < 0) {
+            if (isFood) {
+                System.out.println("Enter the weight of this consumable item: ");
+            } else {
+                System.out.println("Enter the volume of this consumable item: ");
+            }
+            weightOrVolume = getDouble();
         }
 
-        //get expiry month
-        int month = -1;
-        final int MAX_MONTH = 12;
-        while (month < 1 || month > MAX_MONTH) {
-            System.out.println("Enter the month of the expiry date: ");
-            month = getInt();
+        LocalDateTime expiry = getLocalDateTime();
+        Consumable newConsumableItem;
+        if (isFood) {
+            newConsumableItem = ConsumableFactory.getConsumable(true, itemName, itemNotes, price, weightOrVolume, expiry);
+        } else {
+            newConsumableItem = ConsumableFactory.getConsumable(false, itemName, itemNotes, price, weightOrVolume, expiry);
         }
-
-        //get expiry day
-        int day = -1;
-        //max day varies by month
-        int maxDay = 31;
-        if (month == 4 || month == 6 || month == 9 || month == 11) {
-            maxDay = 30;
-        }
-        else if (month == 2) {
-            maxDay = 28;
-        }
-        while (day < 1 || day > maxDay) {
-            System.out.println("Enter the day of the expiry date: ");
-            day = getInt();
-        }
-
-        //TODO: put all of this in a try-catch so the program can catch invalid dates
-        LocalDateTime expiry = LocalDateTime.of(year, month, day, 23, 59);
-        FoodItem newFoodItem = new FoodItem(foodName, foodNotes, price, expiry);
-
         //insert in the correct spot to ensure ascending order of dates
-        int maxSize = foodList.size();
+        int maxSize = consumableList.size();
         for (int i = 0; i < maxSize; i++) {
-            if (expiry.isBefore(foodList.get(i).getExpDate())) {
-                foodList.add(i, newFoodItem);
+            if (expiry.isBefore(consumableList.get(i).getExpDate())) {
+                consumableList.add(i, newConsumableItem);
                 break;
             }
             else if (i == maxSize-1) {
-                foodList.add(newFoodItem);
+                consumableList.add(newConsumableItem);
                 break;
             }
         }
-        foodList.remove(dummy);
-        System.out.println("Item " + foodName + " has been added!");
+        consumableList.remove(dummy);
+        System.out.println("Item " + itemName + " has been added!");
     }
 
     /**
@@ -163,15 +187,15 @@ public class Main {
         listFood();
         //get the item that the user will delete
         int toDelete = -1;
-        while (toDelete < 1 || toDelete > foodList.size()) {
+        while (toDelete < 1 || toDelete > consumableList.size()) {
             System.out.println("Which item would you like to delete? 0 to cancel.");
             toDelete = getInt();
             if (toDelete == 0) {
                 return;
             }
         }
-        FoodItem removed = foodList.get(toDelete-1);
-        foodList.remove(toDelete-1);
+        Consumable removed = consumableList.get(toDelete-1);
+        consumableList.remove(toDelete-1);
         System.out.println(removed.getName() + " has been removed!");
     }
 
@@ -179,12 +203,12 @@ public class Main {
      * menu option 4; lists expired foods
      */
     static void listExpired() {
-        if (foodList.isEmpty()) {
+        if (consumableList.isEmpty()) {
             System.out.println("There are no food items!");
         }
         int itemNum = 1;
         boolean noExpired = true;
-        for (FoodItem item : foodList) {
+        for (Consumable item : consumableList) {
             if (item.isExpired()) {
                 System.out.println("\nFood Item #" + itemNum);
                 System.out.println(item);
@@ -192,7 +216,7 @@ public class Main {
                 itemNum++;
             }
         }
-        if (noExpired && foodList.size() != 0) {
+        if (noExpired && consumableList.size() != 0) {
             System.out.println("There are no expired items!");
         }
     }
@@ -201,21 +225,21 @@ public class Main {
      * menu option 5; lists non-expired foods
      */
     static void listNotExpired() {
-        if (foodList.isEmpty()) {
-            System.out.println("There are no food items!");
+        if (consumableList.isEmpty()) {
+            System.out.println("There are no consumable items!");
         }
         int itemNum = 1;
         boolean allExpired = true;
-        for (FoodItem item : foodList) {
+        for (Consumable item : consumableList) {
             if (!item.isExpired()) {
-                System.out.println("\nFood Item #" + itemNum);
+                System.out.println("\nConsumable Item #" + itemNum);
                 System.out.println(item);
                 allExpired = false;
                 itemNum++;
             }
         }
-        if (allExpired && foodList.size() != 0) {
-            System.out.println("All food items are expired!");
+        if (allExpired && consumableList.size() != 0) {
+            System.out.println("All consumable items are expired!");
         }
     }
 
@@ -223,21 +247,21 @@ public class Main {
      * menu option 6; lists foods expiring within seven days
      */
     static void expiringSevenDays() {
-        if (foodList.isEmpty()) {
-            System.out.println("There are no food items!");
+        if (consumableList.isEmpty()) {
+            System.out.println("There are no consumable items!");
         }
         int itemNum = 1;
         boolean noneWithinSevenDays = true;
-        for (FoodItem item : foodList) {
+        for (Consumable item : consumableList) {
             if (item.getDaysUntilExp() <= 7 && !item.isExpired()) {
-                System.out.println("\nFood Item #" + itemNum);
+                System.out.println("\nConsumable Item #" + itemNum);
                 System.out.println(item);
                 noneWithinSevenDays = false;
                 itemNum++;
             }
         }
-        if (noneWithinSevenDays && foodList.size() != 0) {
-            System.out.println("There are no foods expiring within 7 days!");
+        if (noneWithinSevenDays && consumableList.size() != 0) {
+            System.out.println("There are no consumables expiring within 7 days!");
         }
     }
 
@@ -297,12 +321,12 @@ public class Main {
                 }).create();
         try {
             Reader reader = Files.newBufferedReader(Paths.get(fileName));
-            foodList = myGson.fromJson(reader, new TypeToken<List<FoodItem>>() {}.getType());
+            consumableList = myGson.fromJson(reader, new TypeToken<List<FoodItem>>() {}.getType());
             reader.close();
         } catch (NoSuchFileException e) {
             //if the file is not there, create it
             createFile();
-            foodList.clear();
+            consumableList.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -326,7 +350,7 @@ public class Main {
                 }).create();
         try {
             Writer writer = Files.newBufferedWriter(Paths.get(fileName));
-            myGson.toJson(foodList, writer);
+            myGson.toJson(consumableList, writer);
             writer.close();
 
         } catch (NoSuchFileException e) {
