@@ -22,10 +22,10 @@ public class DrinkItem extends Consumable {
      * @param expDate expiration date of this item
      */
     public DrinkItem(String name, String notes, double price, double volume, LocalDateTime expDate) {
-
+        super("drink");
         //name cannot be empty; enforce with exception
         if (name.equals("")) {
-            throw new IllegalArgumentException("Name drink cannot be empty.");
+            throw new IllegalArgumentException("Name of drink cannot be empty.");
         }
 
         this.name = name;
@@ -50,7 +50,7 @@ public class DrinkItem extends Consumable {
         String drinkString = "This is a drink item.";
         drinkString += "\nDrink: " + name;
         drinkString += "\nNotes: " + notes;
-        drinkString += "\nPrice: " + price;
+        drinkString += "\nPrice: $" + price;
         drinkString += "\nVolume: " + volume + "ml";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         drinkString += "\nExpiry date: " + expDate.format(formatter);

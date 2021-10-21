@@ -22,7 +22,7 @@ public class FoodItem extends Consumable {
      * @param expDate expiration date of this item
      */
     public FoodItem(String name, String notes, double price, double weight, LocalDateTime expDate) {
-
+        super("food");
         //name cannot be empty; enforce with exception
         if (name.equals("")) {
             throw new IllegalArgumentException("Name of food cannot be empty.");

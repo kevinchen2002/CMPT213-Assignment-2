@@ -13,8 +13,14 @@ public class Consumable implements Comparable<Consumable> {
     protected LocalDateTime expDate;
     protected int daysUntilExp;
     protected boolean isExpired;
+    protected String type;
 
     public Consumable() {
+
+    }
+
+    public Consumable(String type) {
+        this.type = type;
     }
 
     /**
@@ -51,6 +57,10 @@ public class Consumable implements Comparable<Consumable> {
      */
     public int getDaysUntilExp() {
         return daysUntilExp;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override

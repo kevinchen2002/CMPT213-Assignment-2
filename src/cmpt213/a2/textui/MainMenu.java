@@ -1,7 +1,9 @@
 package cmpt213.a2.textui;
 
+import cmpt213.a2.gson.extras.RuntimeTypeAdapterFactory;
 import cmpt213.a2.model.Consumable;
 import cmpt213.a2.model.ConsumableFactory;
+import cmpt213.a2.model.DrinkItem;
 import cmpt213.a2.model.FoodItem;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -9,6 +11,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -309,23 +312,36 @@ public class MainMenu {
      * loads data.json file if it exists; derived from https://attacomsian.com/blog/gson-read-json-file
      */
     private static void loadFile() {
+        RuntimeTypeAdapterFactory<Consumable> runTimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(Consumable.class, "type")
+                .registerSubtype(FoodItem.class, "food")
+                .registerSubtype(DrinkItem.class, "drink");
         Gson myGson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
-                new TypeAdapter<LocalDateTime>() {
-                    @Override
-                    public void write(JsonWriter jsonWriter,
-                                      LocalDateTime localDateTime) throws IOException {
-                        jsonWriter.value(localDateTime.toString());
-                    }
+                        new TypeAdapter<LocalDateTime>() {
+                            @Override
+                            public void write(JsonWriter jsonWriter,
+                                              LocalDateTime localDateTime) throws IOException {
+                                jsonWriter.value(localDateTime.toString());
+                            }
 
-                    @Override
-                    public LocalDateTime read(JsonReader jsonReader) throws IOException {
-                        return LocalDateTime.parse(jsonReader.nextString());
-                    }
-                }).create();
+                            @Override
+                            public LocalDateTime read(JsonReader jsonReader) throws IOException {
+                                return LocalDateTime.parse(jsonReader.nextString());
+                            }
+                        })
+                        .registerTypeAdapterFactory(runTimeTypeAdapterFactory)
+        .create();
+
         try {
             Reader reader = Files.newBufferedReader(Paths.get(fileName));
-            consumableList = myGson.fromJson(reader, new TypeToken<List<FoodItem>>() {
-            }.getType());
+            consumableList = myGson.fromJson(reader, new TypeToken<List<Consumable>>(){}.getType());
+            for (Consumable consumable : consumableList) {
+                if (consumable instanceof FoodItem) {
+                    consumable.setType("food");
+                } else if (consumable instanceof  DrinkItem) {
+                    consumable.setType("drink");
+                }
+            }
             reader.close();
         } catch (NoSuchFileException e) {
             //if the file is not there, create it
@@ -340,6 +356,10 @@ public class MainMenu {
      * writes to data.json upon shutdown; derived from https://attacomsian.com/blog/gson-write-json-file
      */
     private static void writeFile() {
+        RuntimeTypeAdapterFactory<Consumable> runTimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(Consumable.class, "type")
+                .registerSubtype(FoodItem.class, "food")
+                .registerSubtype(DrinkItem.class, "drink");
         Gson myGson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
                 new TypeAdapter<LocalDateTime>() {
                     @Override
@@ -352,7 +372,10 @@ public class MainMenu {
                     public LocalDateTime read(JsonReader jsonReader) throws IOException {
                         return LocalDateTime.parse(jsonReader.nextString());
                     }
-                }).create();
+                })
+                .registerTypeAdapterFactory(runTimeTypeAdapterFactory)
+                .create();
+
         try {
             Writer writer = Files.newBufferedWriter(Paths.get(fileName));
             myGson.toJson(consumableList, writer);

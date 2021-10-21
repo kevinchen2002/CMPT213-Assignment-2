@@ -26,8 +26,8 @@ public class TextMenu {
     /**
      * stores menu options
      */
-    private final String[] menuOptions = new String[]{"List food items", "Add new food item", "Remove food item",
-            "List expired food items", "List non-expired food items", "List food items expiring within 7 days", "Exit"};
+    private final String[] menuOptions = new String[]{"List consumable items", "Add new consumable item", "Remove consumable item",
+            "List expired consumable items", "List non-expired consumable items", "List consumable items expiring within 7 days", "Exit"};
 
     private final int NUM_MENU_OPTIONS = 7;
 
