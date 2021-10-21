@@ -26,7 +26,7 @@ public class TextMenu {
     /**
      * stores menu options
      */
-    private final String[] menuOptions = new String[] {"List food items", "Add new food item", "Remove food item",
+    private final String[] menuOptions = new String[]{"List food items", "Add new food item", "Remove food item",
             "List expired food items", "List non-expired food items", "List food items expiring within 7 days", "Exit"};
 
     private final int NUM_MENU_OPTIONS = 7;
@@ -34,7 +34,8 @@ public class TextMenu {
     /**
      * constructor which does nothing
      */
-    public TextMenu() {}
+    public TextMenu() {
+    }
 
     /**
      * prints the title; should only be called once upon startup
@@ -59,6 +60,7 @@ public class TextMenu {
 
     /**
      * shows menu with current date and allows user to select an option
+     *
      * @return the menu option that the user chose
      */
     public int displayMenu() {
@@ -68,7 +70,7 @@ public class TextMenu {
         System.out.println("Today is: " + currentTime.format(formatter) + "\n");
 
         for (int i = 1; i <= NUM_MENU_OPTIONS; i++) {
-            System.out.println(i + ": " + menuOptions[i-1]);
+            System.out.println(i + ": " + menuOptions[i - 1]);
         }
 
         int choice = -1;

@@ -34,6 +34,7 @@ public class MainMenu {
 
     /**
      * helper function that ensures numerical input
+     *
      * @return a valid integer
      */
     private static int getInt() {
@@ -51,6 +52,7 @@ public class MainMenu {
 
     /**
      * helper function that ensures numerical input
+     *
      * @return a valid double
      */
     private static double getDouble() {
@@ -68,6 +70,7 @@ public class MainMenu {
 
     /**
      * helper function that ensures valid date
+     *
      * @return a valid date
      */
     private static LocalDateTime getLocalDateTime() {
@@ -102,7 +105,7 @@ public class MainMenu {
                 }
                 expiry = LocalDateTime.of(year, month, day, 23, 59);
                 return expiry;
-            } catch(DateTimeException e) {
+            } catch (DateTimeException e) {
                 System.out.println("Invalid date. Please enter a valid date.\n");
             }
         }
@@ -193,8 +196,7 @@ public class MainMenu {
             if (expiry.isBefore(consumableList.get(i).getExpDate())) {
                 consumableList.add(i, newConsumableItem);
                 break;
-            }
-            else if (i == maxSize-1) {
+            } else if (i == maxSize - 1) {
                 consumableList.add(newConsumableItem);
                 break;
             }
@@ -217,8 +219,8 @@ public class MainMenu {
                 return;
             }
         }
-        Consumable removed = consumableList.get(toDelete-1);
-        consumableList.remove(toDelete-1);
+        Consumable removed = consumableList.get(toDelete - 1);
+        consumableList.remove(toDelete - 1);
         System.out.println(removed.getName() + " has been removed!");
     }
 
@@ -314,6 +316,7 @@ public class MainMenu {
                                       LocalDateTime localDateTime) throws IOException {
                         jsonWriter.value(localDateTime.toString());
                     }
+
                     @Override
                     public LocalDateTime read(JsonReader jsonReader) throws IOException {
                         return LocalDateTime.parse(jsonReader.nextString());
@@ -321,7 +324,8 @@ public class MainMenu {
                 }).create();
         try {
             Reader reader = Files.newBufferedReader(Paths.get(fileName));
-            consumableList = myGson.fromJson(reader, new TypeToken<List<FoodItem>>() {}.getType());
+            consumableList = myGson.fromJson(reader, new TypeToken<List<FoodItem>>() {
+            }.getType());
             reader.close();
         } catch (NoSuchFileException e) {
             //if the file is not there, create it
@@ -343,6 +347,7 @@ public class MainMenu {
                                       LocalDateTime localDateTime) throws IOException {
                         jsonWriter.value(localDateTime.toString());
                     }
+
                     @Override
                     public LocalDateTime read(JsonReader jsonReader) throws IOException {
                         return LocalDateTime.parse(jsonReader.nextString());

@@ -1,6 +1,5 @@
 package cmpt213.a2.model;
 
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -15,10 +14,11 @@ public class FoodItem extends Consumable {
 
     /**
      * Constructor for FoodItem
-     * @param name the name of the item, cannot be empty
-     * @param notes notes any other information, can be empty
-     * @param price price of this item
-     * @param weight weight of this item
+     *
+     * @param name    the name of the item, cannot be empty
+     * @param notes   notes any other information, can be empty
+     * @param price   price of this item
+     * @param weight  weight of this item
      * @param expDate expiration date of this item
      */
     public FoodItem(String name, String notes, double price, double weight, LocalDateTime expDate) {
@@ -42,6 +42,7 @@ public class FoodItem extends Consumable {
 
     /**
      * Constructs a string with all information about this FoodItem
+     *
      * @return the constructed string
      */
     @Override
@@ -62,12 +63,10 @@ public class FoodItem extends Consumable {
             this.daysUntilExp = daysUntilExpiry;
             if (daysUntilExpiry <= 0) {
                 foodString += "\nThis food item will expire today.";
-            }
-            else {
+            } else {
                 foodString += "\nThis food will expire in " + daysUntilExpiry + " day(s).";
             }
-        }
-        else {
+        } else {
             this.isExpired = true;
             int daysUntilExpiry = (int) ChronoUnit.DAYS.between(currentTime, expDate);
             this.daysUntilExp = daysUntilExpiry;

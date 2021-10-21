@@ -14,10 +14,11 @@ public class DrinkItem extends Consumable {
 
     /**
      * Constructor for FoodItem
-     * @param name the name of the item, cannot be empty
-     * @param notes notes any other information, can be empty
-     * @param price price of this item
-     * @param volume volume of this item
+     *
+     * @param name    the name of the item, cannot be empty
+     * @param notes   notes any other information, can be empty
+     * @param price   price of this item
+     * @param volume  volume of this item
      * @param expDate expiration date of this item
      */
     public DrinkItem(String name, String notes, double price, double volume, LocalDateTime expDate) {
@@ -41,6 +42,7 @@ public class DrinkItem extends Consumable {
 
     /**
      * Constructs a string with all information about this FoodItem
+     *
      * @return the constructed string
      */
     @Override
@@ -61,12 +63,10 @@ public class DrinkItem extends Consumable {
             this.daysUntilExp = daysUntilExpiry;
             if (daysUntilExpiry <= 0) {
                 drinkString += "\nThis drink item will expire today.";
-            }
-            else {
+            } else {
                 drinkString += "\nThis drink will expire in " + daysUntilExpiry + " day(s).";
             }
-        }
-        else {
+        } else {
             this.isExpired = true;
             int daysUntilExpiry = (int) ChronoUnit.DAYS.between(currentTime, expDate);
             this.daysUntilExp = daysUntilExpiry;

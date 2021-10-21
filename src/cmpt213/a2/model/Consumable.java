@@ -10,7 +10,7 @@ public class Consumable implements Comparable<Consumable> {
     protected String name;
     protected String notes;
     protected double price;
-    public LocalDateTime expDate;
+    protected LocalDateTime expDate;
     protected int daysUntilExp;
     protected boolean isExpired;
 
@@ -19,12 +19,16 @@ public class Consumable implements Comparable<Consumable> {
 
     /**
      * Getter for the name
+     *
      * @return the name
      */
-    public String getName() {return name;}
+    public String getName() {
+        return name;
+    }
 
     /**
      * Getter for the expiry date
+     *
      * @return the expiry date
      */
     public LocalDateTime getExpDate() {
@@ -33,15 +37,21 @@ public class Consumable implements Comparable<Consumable> {
 
     /**
      * Getter for expiration status
+     *
      * @return the expiration status
      */
-    public boolean isExpired() {return isExpired;}
+    public boolean isExpired() {
+        return isExpired;
+    }
 
     /**
      * Getter for the days until expiry
+     *
      * @return the days until expiry
      */
-    public int getDaysUntilExp() {return daysUntilExp;}
+    public int getDaysUntilExp() {
+        return daysUntilExp;
+    }
 
     @Override
     public int compareTo(Consumable o) {
