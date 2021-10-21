@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
  * The Consumable class is the basis for FoodItem and DrinkItem.
  * It has shared fields and methods of the two, as well as implementing Comparable.
  */
-public class Consumable implements Comparable {
+public class Consumable implements Comparable<Consumable> {
     protected String name;
     protected String notes;
     protected double price;
-    LocalDateTime expDate;
+    public LocalDateTime expDate;
     protected int daysUntilExp;
     protected boolean isExpired;
 
@@ -44,8 +44,13 @@ public class Consumable implements Comparable {
     public int getDaysUntilExp() {return daysUntilExp;}
 
     @Override
-    public int compareTo(Object o) {
-        return 0;
-        //TODO: implement this comparable
+    public int compareTo(Consumable o) {
+        if (this.expDate.isAfter(o.expDate)) {
+            return 1;
+        } else if (this.expDate.isBefore(o.expDate)) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }
