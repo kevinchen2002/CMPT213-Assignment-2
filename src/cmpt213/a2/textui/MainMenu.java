@@ -11,7 +11,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -309,36 +308,45 @@ public class MainMenu {
     }
 
     /**
+     * Learned about RuntimeTypeAdapterFactory class from:
+     * https://jansipke.nl/serialize-and-deserialize-a-list-of-polymorphic-objects-with-gson/
+     * Downloaded RuntimeTypeAdapterFactory class from:
+     * https://github.com/google/gson/blob/master/extras/src/main/java/com/google/gson/typeadapters/RuntimeTypeAdapterFactory.java
+     * This is an extra feature of Gson used for deserializing polymorphic objects.
+     * This class is provided by Google on the Gson GitHub page, with the link shown above.
+     */
+    private static final RuntimeTypeAdapterFactory<Consumable> runTimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+            .of(Consumable.class, "type")
+            .registerSubtype(FoodItem.class, "food")
+            .registerSubtype(DrinkItem.class, "drink");
+
+    private static final Gson myGson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
+            new TypeAdapter<LocalDateTime>() {
+                @Override
+                public void write(JsonWriter jsonWriter,
+                                  LocalDateTime localDateTime) throws IOException {
+                    jsonWriter.value(localDateTime.toString());
+                }
+
+                @Override
+                public LocalDateTime read(JsonReader jsonReader) throws IOException {
+                    return LocalDateTime.parse(jsonReader.nextString());
+                }
+            }).registerTypeAdapterFactory(runTimeTypeAdapterFactory).create();
+
+    /**
      * loads data.json file if it exists; derived from https://attacomsian.com/blog/gson-read-json-file
      */
     private static void loadFile() {
-        RuntimeTypeAdapterFactory<Consumable> runTimeTypeAdapterFactory = RuntimeTypeAdapterFactory
-                .of(Consumable.class, "type")
-                .registerSubtype(FoodItem.class, "food")
-                .registerSubtype(DrinkItem.class, "drink");
-        Gson myGson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
-                        new TypeAdapter<LocalDateTime>() {
-                            @Override
-                            public void write(JsonWriter jsonWriter,
-                                              LocalDateTime localDateTime) throws IOException {
-                                jsonWriter.value(localDateTime.toString());
-                            }
-
-                            @Override
-                            public LocalDateTime read(JsonReader jsonReader) throws IOException {
-                                return LocalDateTime.parse(jsonReader.nextString());
-                            }
-                        })
-                        .registerTypeAdapterFactory(runTimeTypeAdapterFactory)
-        .create();
 
         try {
             Reader reader = Files.newBufferedReader(Paths.get(fileName));
-            consumableList = myGson.fromJson(reader, new TypeToken<List<Consumable>>(){}.getType());
+            consumableList = myGson.fromJson(reader, new TypeToken<List<Consumable>>() {
+            }.getType());
             for (Consumable consumable : consumableList) {
                 if (consumable instanceof FoodItem) {
                     consumable.setType("food");
-                } else if (consumable instanceof  DrinkItem) {
+                } else if (consumable instanceof DrinkItem) {
                     consumable.setType("drink");
                 }
             }
@@ -356,25 +364,6 @@ public class MainMenu {
      * writes to data.json upon shutdown; derived from https://attacomsian.com/blog/gson-write-json-file
      */
     private static void writeFile() {
-        RuntimeTypeAdapterFactory<Consumable> runTimeTypeAdapterFactory = RuntimeTypeAdapterFactory
-                .of(Consumable.class, "type")
-                .registerSubtype(FoodItem.class, "food")
-                .registerSubtype(DrinkItem.class, "drink");
-        Gson myGson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
-                new TypeAdapter<LocalDateTime>() {
-                    @Override
-                    public void write(JsonWriter jsonWriter,
-                                      LocalDateTime localDateTime) throws IOException {
-                        jsonWriter.value(localDateTime.toString());
-                    }
-
-                    @Override
-                    public LocalDateTime read(JsonReader jsonReader) throws IOException {
-                        return LocalDateTime.parse(jsonReader.nextString());
-                    }
-                })
-                .registerTypeAdapterFactory(runTimeTypeAdapterFactory)
-                .create();
 
         try {
             Writer writer = Files.newBufferedWriter(Paths.get(fileName));
