@@ -1,0 +1,33 @@
+Use case 1: classifying consumables
+    This OOD currently supports food/drink type consumables. Both FoodItem and DrinkItem are subclasses of Consumable.
+    They largely share the same fields and methods.
+    There are only two differences:
+        ->Food has a weight while drinks have volume.
+        ->The respective toString method indicate whether the consumable is a food or a drink.
+    As such, the MainMenu can handle FoodItems and DrinkItems largely in the same manner, with no redundant code.
+        ->The user is prompted to determine whether an item they want to add is a food or a drink.
+        ->The process for taking name, notes, price, and expiration date is identical.
+        ->Depending on what type of consumable the user wants, the ConsumableFactory creates that object.
+        ->Adding to the list and then listing is identical due to polymorphism.
+    Due to this structure, it would take very little effort to further classify consumables.
+        For example, say one would like to split consumable into food/drink/snack. Snack would have a field "calories".
+        The steps to implement this would be the following:
+            ->Create a new model class "SnackItem" extending Consumable.
+            ->Give this class the "calories" field and a toString indicating that it is a snack.
+            ->In the ConsumableFactory, change the boolean condition (food/not food) into an integer (1/2/3) for type.
+            ->In MainMenu, change addConsumable to prompt for 3 options, and create a SnackItem accordingly.
+        There are very few changes needed to accommodate this addition due to this OOD.
+    In general, this object-oriented design makes good use of polymorphism. It can support and distinguish between
+    multiple types of consumable without needing duplicate code to support operations for each type.
+
+Use case 2: turning the system into an Android app
+    Since the model and UI are independent of each other, the Consumable, FoodItem, DrinkItem, and ConsumableFactory
+    classes could be placed into an app along with all their existing functionality. The text-based UI would be replaced
+    with a more robust visual one without any issues since the model/UI are split clearly.
+
+    For example, menu options from 1 to 7 would be listed visually on a screen. If the user wanted to add a consumable,
+    There might be text fields that would allow the user to enter the relevant data. Once this is all validated, the
+    ConsumableFactory would be used to create the item, and this item would then be added to an underlying list.
+
+    Due to the object-oriented design and model/UI split, all of the current operations could be replicated in another
+    environment, while preserving the model files.

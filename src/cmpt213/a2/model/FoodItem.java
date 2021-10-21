@@ -6,13 +6,21 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 /**
- * FoodItem class
- * Stores fields name, notes, price, expiration date, days until expiry, and expiration status
- * FoodItem objects are stored in an ArrayList in Main
+ * FoodItem class, a subclass of Consumable.
+ * Stores the name, notes, price, weight, and expiration date.
+ * Consumables are stored in the MainMenu.
  */
 public class FoodItem extends Consumable {
     double weight;
 
+    /**
+     * Constructor for FoodItem
+     * @param name the name of the item, cannot be empty
+     * @param notes notes any other information, can be empty
+     * @param price price of this item
+     * @param weight weight of this item
+     * @param expDate expiration date of this item
+     */
     public FoodItem(String name, String notes, double price, double weight, LocalDateTime expDate) {
 
         //name cannot be empty; enforce with exception
@@ -32,6 +40,10 @@ public class FoodItem extends Consumable {
         this.daysUntilExp = (int) ChronoUnit.DAYS.between(currentTime, expDate);
     }
 
+    /**
+     * Constructs a string with all information about this FoodItem
+     * @return the constructed string
+     */
     @Override
     public String toString() {
         String foodString = "This is a food item.";

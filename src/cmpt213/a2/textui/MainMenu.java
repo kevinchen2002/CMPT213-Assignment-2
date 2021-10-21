@@ -19,22 +19,24 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Main class
+ * The MainMenu handles all operations of the system.
+ * It is instantiated and called by ConsumablesTracker, the entry point.
+ * data.json is loaded (or created if it does not exist) upon startup and saved when terminating.
  */
 public class MainMenu {
 
     /**
      * ArrayList of FoodItems
      */
-    static ArrayList<Consumable> consumableList = new ArrayList<>();
+    private static ArrayList<Consumable> consumableList = new ArrayList<>();
 
-    static String fileName = "data.json";
+    private static final String fileName = "data.json";
 
     /**
      * helper function that ensures numerical input
      * @return a valid integer
      */
-    static int getInt() {
+    private static int getInt() {
         int choice;
         Scanner in = new Scanner(System.in);
         while (true) {
@@ -51,7 +53,7 @@ public class MainMenu {
      * helper function that ensures numerical input
      * @return a valid double
      */
-    static double getDouble() {
+    private static double getDouble() {
         double choice;
         Scanner in = new Scanner(System.in);
         while (true) {
@@ -64,40 +66,52 @@ public class MainMenu {
         }
     }
 
-    static LocalDateTime getLocalDateTime() {
+    /**
+     * helper function that ensures valid date
+     * @return a valid date
+     */
+    private static LocalDateTime getLocalDateTime() {
         while (true) {
-            int year = -1;
-            int month = -1;
-            int day = -1;
+            int year;
+            int month;
+            int day;
             LocalDateTime expiry;
             try {
                 final int MIN_YEAR = 2000;
+                System.out.println("Enter the year of the expiry date: ");
+                year = getInt();
                 while (year < MIN_YEAR) {
-                    System.out.println("Enter the year of the expiry date: ");
+                    System.out.println("The year must be at least 2000.");
                     year = getInt();
                 }
+
                 final int MAX_MONTH = 12;
+                System.out.println("Enter the month of the expiry date: ");
+                month = getInt();
                 while (month < 1 || month > MAX_MONTH) {
-                    System.out.println("Enter the month of the expiry date: ");
+                    System.out.println("The month must be between 1 and 12.");
                     month = getInt();
                 }
+
                 final int MAX_DAY = 31;
+                System.out.println("Enter the day of the expiry date: ");
+                day = getInt();
                 while (day < 1 || day > MAX_DAY) {
-                    System.out.println("Enter the day of the expiry date: ");
+                    System.out.println("The day must between 1 and 31.");
                     day = getInt();
                 }
                 expiry = LocalDateTime.of(year, month, day, 23, 59);
                 return expiry;
             } catch(DateTimeException e) {
-                System.out.println("Invalid date!\n");
+                System.out.println("Invalid date. Please enter a valid date.\n");
             }
         }
     }
 
     /**
-     * menu option 1; lists all food items
+     * menu option 1; lists all consumable items
      */
-    static void listFood() {
+    private static void listConsumables() {
         if (consumableList.isEmpty()) {
             System.out.println("There are no consumable items!");
         }
@@ -110,59 +124,68 @@ public class MainMenu {
     }
 
     /**
-     * menu option 2; takes in fields and adds a food item
+     * menu option 2; takes in fields and adds a consumable item
      * looks at the list to ensure that it is inserted in order by expiration date
      * this ensures that sorting will not be needed in the future
      */
-    static void addFood() {
+    private static void addConsumable() {
         Scanner in = new Scanner(System.in);
 
         FoodItem dummy = new FoodItem("dummy", "dummy", 1, 1, LocalDateTime.now());
         consumableList.add(dummy);
 
-        int itemType = 0;
+        System.out.println("Is this a [1] Food item or [2] Drink item?");
+        int itemType = getInt();
         while (itemType < 1 || itemType > 2) {
-            System.out.println("Is this a [1] Food item or [2] Drink item?");
+            System.out.println("Please select [1] Food item or [2] Drink item.");
             itemType = getInt();
         }
 
         boolean isFood;
-        isFood = itemType == 1;
+        String consumableType;
+        String dataType;
+        if (itemType == 1) {
+            isFood = true;
+            consumableType = "food";
+            dataType = "weight";
+        } else {
+            isFood = false;
+            consumableType = "drink";
+            dataType = "volume";
+        }
 
-        String itemName = "";
+        System.out.println("Enter the name of the new " + consumableType + " item: ");
+        String itemName = in.nextLine();
         while (itemName.equals("")) {
-            System.out.println("Enter the name of the new consumable item: ");
+            System.out.println("The name cannot be empty.");
             itemName = in.nextLine();
         }
 
-        String itemNotes;
-        System.out.println("Enter any notes for the new consumable item: ");
-        itemNotes = in.nextLine();
+        System.out.println("Enter any notes for the new " + consumableType + " item: ");
+        String itemNotes = in.nextLine();
 
         //get price
-        double price = -1.0;
+        System.out.println("Enter the price of this " + consumableType + " item: ");
+        double price = getDouble();
         while (price < 0) {
-            System.out.println("Enter the price of this consumable item: ");
+            System.out.println("The price cannot be negative.");
             price = getDouble();
         }
 
-        //get weight
-        double weightOrVolume = -1;
+        //get weight or volume
+        System.out.println("Enter the " + dataType + " of this " + consumableType + " item: ");
+        double weightOrVolume = getDouble();
         while (weightOrVolume < 0) {
-            if (isFood) {
-                System.out.println("Enter the weight of this consumable item: ");
-            } else {
-                System.out.println("Enter the volume of this consumable item: ");
-            }
+            System.out.println("The " + consumableType + " cannot be negative.");
             weightOrVolume = getDouble();
         }
 
         LocalDateTime expiry = getLocalDateTime();
         Consumable newConsumableItem;
         if (isFood) {
-            newConsumableItem = ConsumableFactory.getConsumable(true, itemName, itemNotes, price, weightOrVolume, expiry);
+            newConsumableItem = ConsumableFactory.getInstance(true, itemName, itemNotes, price, weightOrVolume, expiry);
         } else {
-            newConsumableItem = ConsumableFactory.getConsumable(false, itemName, itemNotes, price, weightOrVolume, expiry);
+            newConsumableItem = ConsumableFactory.getInstance(false, itemName, itemNotes, price, weightOrVolume, expiry);
         }
         //insert in the correct spot to ensure ascending order of dates
         int maxSize = consumableList.size();
@@ -181,10 +204,10 @@ public class MainMenu {
     }
 
     /**
-     * menu option 3; removes a food
+     * menu option 3; removes a consumable
      */
-    static void removeFood() {
-        listFood();
+    private static void removeConsumable() {
+        listConsumables();
         //get the item that the user will delete
         int toDelete = -1;
         while (toDelete < 1 || toDelete > consumableList.size()) {
@@ -200,9 +223,9 @@ public class MainMenu {
     }
 
     /**
-     * menu option 4; lists expired foods
+     * menu option 4; lists expired consumables
      */
-    static void listExpired() {
+    private static void listExpired() {
         if (consumableList.isEmpty()) {
             System.out.println("There are no food items!");
         }
@@ -222,9 +245,9 @@ public class MainMenu {
     }
 
     /**
-     * menu option 5; lists non-expired foods
+     * menu option 5; lists non-expired consumables
      */
-    static void listNotExpired() {
+    private static void listNotExpired() {
         if (consumableList.isEmpty()) {
             System.out.println("There are no consumable items!");
         }
@@ -244,9 +267,9 @@ public class MainMenu {
     }
 
     /**
-     * menu option 6; lists foods expiring within seven days
+     * menu option 6; lists consumables expiring within seven days
      */
-    static void expiringSevenDays() {
+    private static void listExpiringSevenDays() {
         if (consumableList.isEmpty()) {
             System.out.println("There are no consumable items!");
         }
@@ -266,32 +289,9 @@ public class MainMenu {
     }
 
     /**
-     * calls the menu from TextMenu object and performs the corresponding operation
-     */
-    static void mainMenu() {
-        TextMenu menu = new TextMenu();
-        menu.printTitle();
-        int choice = 0;
-        while (choice != 7) {
-            choice = menu.displayMenu();
-            switch (choice) {
-                case 1 -> listFood();
-                case 2 -> addFood();
-                case 3 -> removeFood();
-                case 4 -> listExpired();
-                case 5 -> listNotExpired();
-                case 6 -> expiringSevenDays();
-                case 7 -> writeFile();
-                default -> System.out.println("Pick one of the above options");
-            }
-        }
-
-    }
-
-    /**
      * Creates a new data.json file if needed; derived from https://www.w3schools.com/java/java_files_create.asp
      */
-    static void createFile() {
+    private static void createFile() {
         try {
             File foodStorage = new File(fileName);
             if (foodStorage.createNewFile()) {
@@ -306,7 +306,7 @@ public class MainMenu {
     /**
      * loads data.json file if it exists; derived from https://attacomsian.com/blog/gson-read-json-file
      */
-    static void loadFile() {
+    private static void loadFile() {
         Gson myGson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
                 new TypeAdapter<LocalDateTime>() {
                     @Override
@@ -335,7 +335,7 @@ public class MainMenu {
     /**
      * writes to data.json upon shutdown; derived from https://attacomsian.com/blog/gson-write-json-file
      */
-    static void writeFile() {
+    private static void writeFile() {
         Gson myGson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
                 new TypeAdapter<LocalDateTime>() {
                     @Override
@@ -361,11 +361,25 @@ public class MainMenu {
     }
 
     /**
-     * main method
-     * @param args command line argument
+     * calls the menu from TextMenu object and performs the corresponding operation
      */
-    public static void main(String[] args) {
+    public void mainMenu() {
         loadFile();
-        mainMenu();
+        TextMenu menu = new TextMenu();
+        menu.printTitle();
+        int choice = 0;
+        while (choice != 7) {
+            choice = menu.displayMenu();
+            switch (choice) {
+                case 1 -> listConsumables();
+                case 2 -> addConsumable();
+                case 3 -> removeConsumable();
+                case 4 -> listExpired();
+                case 5 -> listNotExpired();
+                case 6 -> listExpiringSevenDays();
+                case 7 -> writeFile();
+                default -> System.out.println("Pick one of the above options");
+            }
+        }
     }
 }

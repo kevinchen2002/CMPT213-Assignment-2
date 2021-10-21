@@ -4,9 +4,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * FoodItem class, a subclass of Consumable.
+ * Stores the name, notes, price, weight, and expiration date.
+ * Consumables are stored in the MainMenu.
+ */
 public class DrinkItem extends Consumable {
     double volume;
 
+    /**
+     * Constructor for FoodItem
+     * @param name the name of the item, cannot be empty
+     * @param notes notes any other information, can be empty
+     * @param price price of this item
+     * @param volume volume of this item
+     * @param expDate expiration date of this item
+     */
     public DrinkItem(String name, String notes, double price, double volume, LocalDateTime expDate) {
 
         //name cannot be empty; enforce with exception
@@ -26,6 +39,10 @@ public class DrinkItem extends Consumable {
         this.daysUntilExp = (int) ChronoUnit.DAYS.between(currentTime, expDate);
     }
 
+    /**
+     * Constructs a string with all information about this FoodItem
+     * @return the constructed string
+     */
     @Override
     public String toString() {
         String drinkString = "This is a drink item.";
