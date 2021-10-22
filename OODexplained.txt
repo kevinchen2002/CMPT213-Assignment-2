@@ -1,33 +1,42 @@
-Use case 1: classifying consumables
-    This OOD currently supports food/drink type consumables. Both FoodItem and DrinkItem are subclasses of Consumable.
-    They largely share the same fields and methods.
-    There are only two differences:
-        ->Food has a weight while drinks have volume.
-        ->The respective toString method indicate whether the consumable is a food or a drink.
-    As such, the MainMenu can handle FoodItems and DrinkItems largely in the same manner, with no redundant code.
-        ->The user is prompted to determine whether an item they want to add is a food or a drink.
-        ->The process for taking name, notes, price, and expiration date is identical.
-        ->Depending on what type of consumable the user wants, the ConsumableFactory creates that object.
-        ->Adding to the list and then listing is identical due to polymorphism.
-    Due to this structure, it would take very little effort to further classify consumables.
-        For example, say one would like to split consumable into food/drink/snack. Snack would have a field "calories".
-        The steps to implement this would be the following:
-            ->Create a new model class "SnackItem" extending Consumable.
-            ->Give this class the "calories" field and a toString indicating that it is a snack.
-            ->In the ConsumableFactory, change the boolean condition (food/not food) into an integer (1/2/3) for type.
-            ->In MainMenu, change addConsumable to prompt for 3 options, and create a SnackItem accordingly.
-        There are very few changes needed to accommodate this addition due to this OOD.
-    In general, this object-oriented design makes good use of polymorphism. It can support and distinguish between
-    multiple types of consumable without needing duplicate code to support operations for each type.
+Use case 1: adding objects to the list
+    Constructing and adding an object with the MainMenu is streamlined with this object-oriented design.
+    FoodItem and DrinkItem are both subclasses of Consumable, with only two notable differences:
+        ->FoodItem has a weight, while DrinkItem has a volume.
+        ->FoodItem and DrinkItem have different toStrings, each indicating their respective type.
+    Since they are both variations of Consumable, I use properties of polymorphism to streamline construction.
+    The ConsumableFactory is a simple class that creates and returns either a FoodItem or DrinkItem.
+    The getInstance method takes in a boolean to indicate whether if it is a food, then creates the item based
+    off of the information given. This design pattern ensures that there is minimal duplicate code, and maintenance
+    will be easier.
 
-Use case 2: turning the system into an Android app
-    Since the model and UI are independent of each other, the Consumable, FoodItem, DrinkItem, and ConsumableFactory
-    classes could be placed into an app along with all their existing functionality. The text-based UI would be replaced
-    with a more robust visual one without any issues since the model/UI are split clearly.
+    Additionally, this also means that the UI can also treat the two classes largely the same.
+    Since most fields (name, notes, price, expiry date) are identical between the two, I only need to display
+    different text to ask for the weight/volume. I then get an instance of FoodItem or DrinkItem with the
+    ConsumableFactory.
 
-    For example, menu options from 1 to 7 would be listed visually on a screen. If the user wanted to add a consumable,
-    There might be text fields that would allow the user to enter the relevant data. Once this is all validated, the
-    ConsumableFactory would be used to create the item, and this item would then be added to an underlying list.
+    Due to the polymorphic properties of these objects, they can be stored in one ArrayList that stores consumables.
+    This means that their fields, such as expiry date, can be compared with each other was well. As such, the mixed
+    food/drink list can be sorted by expiry date, despite not being of the same type.
 
-    Due to the object-oriented design and model/UI split, all of the current operations could be replicated in another
-    environment, while preserving the model files.
+    In general, polymorphism and the ConsumableFactory infrastructure streamlines adding new Consumables significantly.
+    The OOD is designed to reduce redundancy and treat Food and Drink the same wherever possible.
+
+Use case 2: saving objects using Gson
+    Deserializing polymorphic objects is difficult and not supported by the default Gson functionality.
+    This is because the json string does not explicitly communicate whether a Consumable is a FoodItem or DrinkItem.
+    One of the suggested solutions to this issue was to read in a Consumable and reconstruct the list,
+    making each object either a FoodItem or DrinkItem based on a field storing the type.
+
+    However, I used an extra Gson feature from Google's GitHub to accomplish this without the need to manually
+    reconstruct the objects:
+    https://github.com/google/gson/blob/master/extras/src/main/java/com/google/gson/typeadapters/RuntimeTypeAdapterFactory.java
+    The RuntimeTypeAdapterFactory class allows the Gson to distinguish between subtypes. I create a
+    RuntimeTypeAdapterFactory with the subtypes "food" and "drink". When creating a Consumable object from
+    ConsumableFactory, I set "food" or "drink" in the type field as well. So, after setting the
+    RuntimeTypeAdapterFactory to my Gson object, it can distinguish between a FoodItem and DrinkItem, and makes it into
+    its respective type. Since this does not set the type field, I must do it manually when loading; this allows
+    objects to be serialized and deserialized multiple times.
+
+    This solution respects the OOD, since otherwise I would have to read all the fields of a Consumable object and
+    recreate a FoodItem or DrinkItem based on that information. The RuntimeTypeAdapterFactory allows me to load a list
+    of Consumables without manually parsing all their data.
